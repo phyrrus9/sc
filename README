@@ -1,0 +1,57 @@
+====================global comment block=============================
+The Simple C programming language. Copygight © 2012 the contributors
+The Simple C (SC) programming language, is a basic attempt at making
+an easy to learn language with powerful capabilities. This language
+will translate to c++ code and then call the native c++ compiler on
+your machine. Each individual file should have a block to explain
+what the code in that file is used for.
+This code is open source under the GPL version 3 lisence (look it up)
+
+==================How to use the sc language==============================
+SC has some very few rules. Firstly, each line must begin with an opcode,
+which can be found in the list below. After that, each reserved command is
+called a word. EVERY WORD MUST HAVE THE GLOBAL SEPARATOR! This string of
+characters, is a colon surrounded by spaces (" : "), this is how we tell
+what your arguments are. Certain opcodes require more parameters than the
+rest. EVERY PROGRAM MUST HAVE A START FUNCTION! Somewhere in your program,
+you must have a function named "start", in all lowercase, so that the OS
+you are running knows where to start executing your program. You do not
+need to define the function start (as the compiler will already be looking
+for it), but you do need to define all of the other functions you use.
+Variables. Variables are all around us, so for this language, there are
+some basic variable data types: string, integer, character, and constant.
+All of these (except constants) can be defined. You define variables with
+the var word, which will be explained below in the table. Comments are just
+any non-word data. So, you could type this entire file into any point of 
+your program and it would not affect it, since they are not copied into the
+c++ source file. If you use a word in your comments, place a . before it to
+tell the compiler that you are using it in a comment, not code.
+
+WORD          PARAM1            PARAM2             PARAM3           PARAM4          Description
+funcdef       function name     ------------       ------------     -----------     Define a function for use later
+function      function name     parameters*        ------------     -----------     Define function code
+end           function name     ------------       ------------     -----------     End function code
+call          function name     ------------       ------------     -----------     Jump to function code
+var           variable name     variable type      ------------     -----------     Define a variable
+set           variable name     variable type      variable value   -----------     Set a value
+print         constant value    ------------       ------------     -----------     Print a string constant
+prints        string name       ------------       ------------     -----------     Print a string
+printi        integer name      ------------       ------------     -----------     Print an integer
+printc        character name    ------------       ------------     -----------     Print a character
+
+===========================strings===========================================
+Strings have special stuff associated with them. NEVER USE SPACES IN STRINGS!
+if you use a space, it will likely mess up part of your program. Instead, we
+have mapped a control character ('~') to do some special string business. If
+you run { print Hello~World! } you will get "Hello World!" on your screen,
+seems pretty simple. There are a few other control characters and they are in
+the table below
+
+Sequence     Description
+~            Place a space
+~n           Place a \n
+More to come
+
+
+=================================Operators and contitionals==================
+These are features we have yet to finish (or start)
