@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <cstdlib>
-#define VERSION "1.0.1-a"
+#define VERSION "1.0.1-b"
 enum type { STRING, INTEGER, CHARACTER };
 typedef struct
 {
@@ -37,7 +37,7 @@ void tab(FILE *of, int tabbing)
         fprintf(of, "\t");
     }
 }
-void strparser(char *str)
+void strparser(char str[])
 {
     int len = strlen(str);
     for (int i = 0; i < len; i++)
@@ -45,7 +45,12 @@ void strparser(char *str)
         if (str[i] == '~')
         {
             if (str[i + 1] == '~')
-                break;
+            {
+                str[i+1] = '\b';
+                if (str[i + 2] == '~')
+                    i += 3;
+                continue;
+            }
             if (str[i + 1] == 'n')
             {
                 str[i] = '\\';
@@ -273,7 +278,7 @@ void parse(FILE *inf, FILE *of)
             rp(value); //value
             sif(third_param, "string")
             {
-                strparser(third_param);
+                strparser(value);
                 fprintf(of, "%s.set(\"%s\"); //set string variable \n", second_param, value);
             }
             sif(third_param, "integer")
@@ -385,6 +390,10 @@ int main(int argc, char * * argv)
                     compile = true;
             }
         }
+    }
+    else
+    {
+        _exit = false;
     }
     if (_exit)
     {
