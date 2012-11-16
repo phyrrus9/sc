@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <cstdlib>
+#define VERSION "1.0.1-a"
 enum type { STRING, INTEGER, CHARACTER };
 typedef struct
 {
@@ -34,6 +35,32 @@ void tab(FILE *of, int tabbing)
     for (int i = 0; i < tabbing; i++)
     {
         fprintf(of, "\t");
+    }
+}
+void strparser(char *str)
+{
+    int len = strlen(str);
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] == '~')
+        {
+            if (str[i + 1] == '~')
+                break;
+            if (str[i + 1] == 'n')
+            {
+                str[i] = '\\';
+                str[i + 1] = 'n';
+            }
+            else if (str[i + 1] == 't')
+            {
+                str[i] = '\\';
+                str[i + 1] = 't';
+            }
+            else
+            {
+                str[i] = ' ';
+            }
+        }
     }
 }
 void parse(FILE *inf, FILE *of)
@@ -246,22 +273,7 @@ void parse(FILE *inf, FILE *of)
             rp(value); //value
             sif(third_param, "string")
             {
-                int len = strlen(value);
-                for (int i = 0; i < len; i++)
-                {
-                    if (value[i] == '~')
-                    {
-                        if (value[i + 1] == 'n')
-                        {
-                            value[i] = '\\';
-                            value[i + 1] = 'n';
-                        }
-                        else
-                        {
-                            value[i] = ' ';
-                        }
-                    }
-                }
+                strparser(third_param);
                 fprintf(of, "%s.set(\"%s\"); //set string variable \n", second_param, value);
             }
             sif(third_param, "integer")
@@ -286,22 +298,7 @@ void parse(FILE *inf, FILE *of)
         opc("print")
         {
             rp(second_param);
-            int len = strlen(second_param);
-            for (int i = 0; i < len; i++)
-            {
-                if (second_param[i] == '~')
-                {
-                    if (second_param[i + 1] == 'n')
-                    {
-                        second_param[i] = '\\';
-                        second_param[i + 1] = 'n';
-                    }
-                    else
-                    {
-                        second_param[i] = ' ';
-                    }
-                }
-            }
+            strparser(second_param);
             fprintf(of, "printf(\"%s\"); //print text to screen \n", second_param);
         }
         opc("prints") //print string variable
@@ -336,18 +333,80 @@ void parse(FILE *inf, FILE *of)
 
 int main(int argc, char * * argv)
 {
+    bool _exit = true;
+    int output = 0, input = 0;
+    char *compiler = new char[7];
+    strcpy(compiler, "g++");
+    bool compile = false;
     if (argc < 2)
     {
         printf("Error! No input files!\n");
         exit(-1);
     }
+    if (argv[1][0] == '-')
+    {
+        int length = strlen(argv[1]);
+        for (int i = 0; i < length; i++)
+        {
+            switch (argv[1][i])
+            {
+                case 'v':
+                    printf("Version: %s\n", VERSION);
+                    break;
+                case 'h':
+                    printf("SC Compiler: How to use\n"
+                           "%s <source file>\n"
+                           "%s -[options] <file>& <file>&\n"
+                           "& - optional\n"
+                           "Output defaults to out.cpp. No error checking is\n"
+                           "performed, g++ will do this for you.\n"
+                           "Options:\n"
+                           "v - display version\n"
+                           "h - show this dialog\n"
+                           "c - compile, requires -iX\n"
+                           "o - output file *Number of arg (starting with 2)\n"
+                           "i - input file *Numver of arg (starting with 2)\n"
+                           "* - must have number following.\n",
+                           argv[0], argv[0]);
+                    break;
+                case 'o':
+                    output = argv[1][i + 1] - 48;
+                    printf("Compiling to %s\n", argv[output]);
+                    i += 1;
+                    _exit = false;
+                    break;
+                case 'i':
+                    input = argv[1][i + 1] - 48;
+                    printf("Reading from %s\n", argv[input]);
+                    i += 1;
+                    _exit = false;
+                    break;
+                case 'c':
+                    compile = true;
+            }
+        }
+    }
+    if (_exit)
+    {
+        exit(-1);
+    }
     char filename[15];
     char outfile[15];
+    char comfile[15];
     strcpy(filename, argv[1]);
     strcpy(outfile, "out.cpp");
-    if (argc > 2)
+    strcpy(comfile, "a.out");
+    if (output > 0 && !compile)
     {
-        strcpy(outfile, argv[2]);
+        strcpy(outfile, argv[output]);
+    }
+    if (output > 0 && compile)
+    {
+        strcpy(comfile, argv[output]);
+    }
+    if (input > 0)
+    {
+        strcpy(filename, argv[input]);
     }
     FILE *inf;
     FILE *of;
@@ -362,4 +421,24 @@ int main(int argc, char * * argv)
             "\treturn 0;\n"
             "}\n");
     fclose(of);
+    if (compile) //no errorcheck compilation
+    {
+        char *command = new char[55];
+        char *rm = new char[23];
+        strcpy(command, compiler);
+        strcat(command, " -o ");
+        strcat(command, comfile);
+        strcat(command, " ");
+        strcat(command, outfile);
+        strcat(command, " ");
+        //system("scerror ./out.log");
+        system("rm -rf out.log");
+        //strcat(command, flags);
+        strcpy(rm, "rm ");
+        strcat(rm, outfile);
+        system(command);
+        system(rm);
+        delete[] command;
+        delete[] rm;
+    }
 }
