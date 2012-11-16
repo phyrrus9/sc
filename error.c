@@ -33,5 +33,7 @@ int main(int argc, char * * argv)
             printf("Error! No start function defined in program\n");
 	if (strstr(a, "conflicting declaration") != NULL)
 	    printf("Error! Variable declaration conflict\n");
+	if (strstr(a, "error: stray ‘") != NULL)
+	    printf("Error! invalid operator\n");
     }
 }

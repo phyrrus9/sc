@@ -29,6 +29,13 @@ void initstrarray(char * * array, int elements, int width)
     for(int i = 0; i < 5; ++i)
         array[i] = new char[30];
 }
+void tab(FILE *of, int tabbing)
+{
+    for (int i = 0; i < tabbing; i++)
+    {
+        fprintf(of, "\t");
+    }
+}
 void parse(FILE *inf, FILE *of)
 {
     if (inf == NULL)
@@ -39,11 +46,12 @@ void parse(FILE *inf, FILE *of)
     char** functions;
     int function_number = 0;
     bool code = false;
+    int tabbing = 0;
     variable *variable_list;
     //initstrarray(list, 5, 30);
     initstrarray(functions, 2, 30);
     //print includes
-    fprintf(of, "#include <iostream>\n#include <cstdio>\n#include <string.h>\n#include \"types.h\"\nusing namespace std;\n");
+    fprintf(of, "#include <iostream>\n#include <cstdio>\n#include <string.h>\n#include <cstring>\n#include \"types.h\"\nusing namespace std;\n");
     while (fscanf(inf, "%s", opcode) != EOF)
     {
         //printf("op: %s\n", opcode);
@@ -81,6 +89,125 @@ void parse(FILE *inf, FILE *of)
             sif(third_param, "none")
                 fprintf(of, "void %s(); //function prototype\n", second_param);
             continue;
+        }
+        //if : type : param1 : op : param2
+        //code
+        //endif
+        opc("if")
+        {
+            tabbing++;
+            tab(of, tabbing);
+            char *fourth_param = new char[4];
+            char *fifth_param = new char[30];
+            rp(second_param); //type
+            rp(third_param); //var name 1
+            rp(fourth_param); //op
+            rp(fifth_param); //var name 2
+            sif(second_param, "string") //strings are always =
+            {
+                sif(fourth_param, "=")
+                {
+                    fprintf(of, "if (strcmp(%s.get(), %s.get()) == 0)\n", third_param, fifth_param);
+                }
+                else
+                {
+                    fprintf(of, "if (strcmp(%s.get(), %s.get()) != 0)\n", third_param, fifth_param);
+                }
+                tab(of, tabbing);
+                fprintf(of, "{\n");
+            }
+            if (strcmp(second_param, "integer") == 0 || strcmp(second_param, "character") == 0)
+            {
+                char *op = new char[4];
+                sif(fourth_param, "=")
+                {
+                    strcpy(op, "==");
+                }
+                else
+                {
+                    strcpy(op, fourth_param);
+                }
+                fprintf(of, "if (%s %s %s) //autogen if statement\n", third_param, op, fifth_param);
+                tab(of, tabbing);
+                fprintf(of, "{\n");
+                delete[] op;
+            }
+            delete[] fourth_param;
+            delete[] fifth_param;
+        }
+        opc("endif")
+        {
+            //tabbing--;
+            tab(of, tabbing);
+            fprintf(of, "}\n");
+            tabbing--;
+        }
+        opc("adds")
+        {
+            rp(second_param); //var1
+            rp(third_param); //str
+            int len = strlen(third_param);
+            for (int i = 0; i < len; i++)
+            {
+                if (third_param[i] == '~')
+                {
+                    if (third_param[i + 1] == 'n')
+                    {
+                        third_param[i] = '\\';
+                        third_param[i + 1] = 'n';
+                    }
+                    else
+                    {
+                        third_param[i] = ' ';
+                    }
+                }
+            }
+            fprintf(of, "char *addstmp = new char[%s.size + strlen(\"%s\") + 5];\n", second_param, third_param);
+            fprintf(of, "strcpy(addstmp, %s.get());\n", second_param);
+            fprintf(of, "strcat(addstmp, \"%s\"); //add string opcode\n", third_param);
+            fprintf(of, "%s.set(addstmp);\n", second_param);
+            fprintf(of, "delete[] addstmp;\n");
+            continue;
+        }
+        opc("addsvar")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "char *addstmp = new char[%s.size + strlen(%s.get()) + 5];\n", second_param, third_param);
+            fprintf(of, "strcpy(addstmp, %s.get());\n", second_param);
+            fprintf(of, "strcat(addstmp, %s.get()); //add string opcode\n", third_param);
+            fprintf(of, "%s.set(addstmp);\n", second_param);
+            fprintf(of, "delete[] addstmp;\n");
+        }
+        opc("add")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "%s += %s; //add opcode\n", second_param, third_param);
+        }
+        opc("subtract")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "%s -= %s; //sub opcode\n", second_param, third_param);
+        }
+        opc("multiply")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "%s += %s; //mul opcode\n", second_param, third_param);
+        }
+        opc("divide")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "%s /= %s; //div opcode\n", second_param, third_param);
+        }
+        opc("modulus")
+        {
+            rp(second_param); //var1
+            rp(third_param); //var2
+            fprintf(of, "%s %%= %s; //mod opcode\n", second_param, third_param);
         }
         opc("call")
         {

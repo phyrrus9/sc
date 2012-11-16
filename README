@@ -38,6 +38,15 @@ print         constant value    ------------       ------------     ----------- 
 prints        string name       ------------       ------------     -----------     Print a string
 printi        integer name      ------------       ------------     -----------     Print an integer
 printc        character name    ------------       ------------     -----------     Print a character
+add           integer 1         integer 2          ------------     -----------     Add two integers, result in integer 1
+subtract      integer 1         integer 2          ------------     -----------     Subtract two integers, result in integer 1
+multiply      integer 1         integer 2          ------------     -----------     Multiply two integers, result in integer 1
+divide        integer 1         integer 2          ------------     -----------     Divide two integers, result in integer 1
+modulus       integer 1         integer 2          ------------     -----------     Mod two integers, result in integer 1
+addsvar       string 1          string 2           ------------     -----------     Add two string variables
+adds          string 1          constant 1         ------------     -----------     Add a constant to a string
+if            variable 1        operator           variable 2       -----------     Conditional
+endif         -------------    -------------       ------------     -----------     End conditional
 
 ===========================strings===========================================
 Strings have special stuff associated with them. NEVER USE SPACES IN STRINGS!
@@ -54,4 +63,5 @@ More to come
 
 
 =================================Operators and contitionals==================
-These are features we have yet to finish (or start)
+We have a basic conditional system set up (with words), that is available. It
+is a tad different than C is, but it is explainable with the table above.

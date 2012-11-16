@@ -22,6 +22,15 @@ scstr::scstr(int in)
 
 void scstr::set(const char * in)
 {
+	int length = strlen(in);
+	if (length > size)
+	{
+		size = length;
+		char *tmp = new char[length];
+		strcpy(tmp, str);
+		delete[] str;
+		str = tmp;
+	}
 	strcpy(str, in);
 }
 

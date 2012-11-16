@@ -16,4 +16,5 @@ if [[ $rc != 0 ]] ; then
 fi
 echo "Finalizing.."
 rm -rf out.cpp
+rm -rf out.log
 echo "Done."
